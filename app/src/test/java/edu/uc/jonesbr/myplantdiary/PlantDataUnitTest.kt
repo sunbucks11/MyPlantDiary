@@ -21,6 +21,11 @@ class PlantDataUnitTest {
     var plantService = mockk<PlantService>()
 
     @Test
+    fun addition_isNotCorrect() {
+        assertEquals(4, 1+2)
+    }
+
+    @Test
     fun confirmEasternRedbud_outputsEasternRedbud() {
         var plant: Plant = Plant("Cercis", "canadensis", "Eastern Redbud")
         assertEquals("Eastern Redbud", plant.toString())
@@ -61,7 +66,16 @@ class PlantDataUnitTest {
         allPlantsLiveData.postValue(allPlants)
 
         every { plantService.fetchPlants(or("Redbud", "Quercus")) } returns allPlantsLiveData
-        every { plantService.fetchPlants(not(or("Redbud", "Quercus"))) } returns MutableLiveData<ArrayList<Plant>>()
+        every {
+            plantService.fetchPlants(
+                not(
+                    or(
+                        "Redbud",
+                        "Quercus"
+                    )
+                )
+            )
+        } returns MutableLiveData<ArrayList<Plant>>()
 
         mvm.plantService = plantService
     }
