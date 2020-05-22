@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import edu.uc.jonesbr.myplantdiary.dto.Plant
 import edu.uc.jonesbr.myplantdiary.service.PlantService
 import org.junit.Test
-
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.rules.TestRule
@@ -34,6 +33,13 @@ class PlantDataUnitTest {
         thenResultContainsEasternRedbud()
     }
 
+    @Test
+    fun searchForGarbage_returnsNothing() {
+        givenAFeedOfMockedPlantDataAvailable()
+        whenISearchForGarbage()
+        thenIGetZeroResults()
+    }
+
     private fun givenAFeedOfMockedPlantDataAvailable() {
         mvm = MainViewModel()
         createMockData()
@@ -54,7 +60,8 @@ class PlantDataUnitTest {
 
         allPlantsLiveData.postValue(allPlants)
 
-        every { plantService.fetchPlants(any()) } returns allPlantsLiveData
+        every { plantService.fetchPlants(or("Redbud", "Quercus")) } returns allPlantsLiveData
+        every { plantService.fetchPlants(not(or("Redbud", "Quercus"))) } returns MutableLiveData<ArrayList<Plant>>()
 
         mvm.plantService = plantService
     }
@@ -76,13 +83,6 @@ class PlantDataUnitTest {
             }
         }
         assertTrue(redbudFound)
-    }
-
-    @Test
-    fun searchForGarbage_returnsNothing() {
-        givenAFeedOfMockedPlantDataAvailable()
-        whenISearchForGarbage()
-        thenIGetZeroResults()
     }
 
     private fun whenISearchForGarbage() {
