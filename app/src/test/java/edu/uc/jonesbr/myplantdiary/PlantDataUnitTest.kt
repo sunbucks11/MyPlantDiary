@@ -9,8 +9,10 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.rules.TestRule
 import edu.uc.jonesbr.myplantdiary.ui.main.MainViewModel
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 
 class PlantDataUnitTest {
 
@@ -22,7 +24,7 @@ class PlantDataUnitTest {
 
     @Test
     fun addition_isNotCorrect() {
-        assertEquals(3, 1+2)
+        assertEquals(3, 1 + 2)
     }
 
     @Test
@@ -36,6 +38,13 @@ class PlantDataUnitTest {
         givenAFeedOfMockedPlantDataAvailable()
         whenSearchForRedbud()
         thenResultContainsEasternRedbud()
+        thenVerifyFunctionsInvoked()
+    }
+
+    private fun thenVerifyFunctionsInvoked() {
+        verify {plantService.fetchPlants("Redbud")}
+        verify (exactly = 0) { plantService.fetchPlants("Maple")}
+        confirmVerified(plantService)
     }
 
     @Test
@@ -53,6 +62,7 @@ class PlantDataUnitTest {
     private fun createMockData() {
         var allPlantsLiveData = MutableLiveData<ArrayList<Plant>>()
         var allPlants = ArrayList<Plant>()
+
         // Create and add plants to our collection.
         var redbud = Plant("Cercis", "canadensis", "Eastern Redbud")
         allPlants.add(redbud)
